@@ -1,0 +1,215 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Role {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  name      String
+
+  users     User[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("roles")
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+
+  roleId       String   @map("role_id") @db.Uuid
+  role         Role     @relation(fields: [roleId], references: [id])
+
+  username     String   @unique
+
+  firstName    String   @map("first_name")
+  lastName     String   @map("last_name")
+
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+
+  phone        String?
+  avatarUrl    String?  @map("avatar_url")
+
+  pets         Pet[]
+  reports      Report[]
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Species {
+  id        String   @id @default(uuid()) @db.Uuid
+
+  name      String   @unique
+
+  breeds    Breed[]
+  pets      Pet[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("species")
+}
+
+model Breed {
+  id         String   @id @default(uuid()) @db.Uuid
+
+  speciesId  String   @map("species_id") @db.Uuid
+  species    Species  @relation(fields: [speciesId], references: [id])
+
+  name       String
+
+  pets       Pet[]
+
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("breeds")
+}
+
+model Pet {
+  id                String   @id @default(uuid()) @db.Uuid
+
+  ownerId           String   @map("owner_id") @db.Uuid
+  owner             User     @relation(fields: [ownerId], references: [id])
+
+  speciesId         String   @map("species_id") @db.Uuid
+  species           Species  @relation(fields: [speciesId], references: [id])
+
+  breedId           String   @map("breed_id") @db.Uuid
+  breed             Breed    @relation(fields: [breedId], references: [id])
+
+  name              String
+
+  sex               String
+  size              String
+
+  color             String?
+
+  birthDate         DateTime? @map("birth_date") @db.Date
+
+  description       String?
+
+  isSterilized      Boolean   @default(false) @map("is_sterilized")
+  isMicrochipped    Boolean   @default(false) @map("is_microchipped")
+
+  images            PetImage[]
+  reports           Report[]
+
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("pets")
+}
+
+model PetImage {
+  id          String   @id @default(uuid()) @db.Uuid
+
+  petId       String   @map("pet_id") @db.Uuid
+  pet         Pet      @relation(fields: [petId], references: [id])
+
+  imageUrl    String   @map("image_url")
+
+  isPrimary   Boolean  @default(false) @map("is_primary")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("pet_images")
+}
+
+model ReportType {
+  id        String   @id @default(uuid()) @db.Uuid
+
+  code      String   @unique
+  name      String
+
+  reports   Report[]
+
+  @@map("report_types")
+}
+
+model ReportStatus {
+  id        String   @id @default(uuid()) @db.Uuid
+
+  code      String   @unique
+  name      String
+
+  reports   Report[]
+
+  @@map("report_statuses")
+}
+
+model Report {
+  id             String   @id @default(uuid()) @db.Uuid
+
+  petId          String   @map("pet_id") @db.Uuid
+  pet            Pet      @relation(fields: [petId], references: [id])
+
+  userId         String   @map("user_id") @db.Uuid
+  user           User     @relation(fields: [userId], references: [id])
+
+  reportTypeId   String   @map("report_type_id") @db.Uuid
+  reportType     ReportType @relation(fields: [reportTypeId], references: [id])
+
+  statusId       String   @map("status_id") @db.Uuid
+  status         ReportStatus @relation(fields: [statusId], references: [id])
+
+  title          String
+  description    String?
+
+  lastSeenDate   DateTime? @map("last_seen_date")
+
+  rewardAmount   Decimal?  @map("reward_amount")
+
+  locations      ReportLocation[]
+  images         ReportImage[]
+
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("reports")
+}
+
+model ReportLocation {
+  id          String   @id @default(uuid()) @db.Uuid
+
+  reportId    String   @map("report_id") @db.Uuid
+  report      Report   @relation(fields: [reportId], references: [id])
+
+  address     String?
+
+  city        String?
+  state       String?
+  country     String?
+
+  latitude    Decimal?
+  longitude   Decimal?
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("report_locations")
+}
+
+model ReportImage {
+  id          String   @id @default(uuid()) @db.Uuid
+
+  reportId    String   @map("report_id") @db.Uuid
+  report      Report   @relation(fields: [reportId], references: [id])
+
+  imageUrl    String   @map("image_url")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("report_images")
+}
