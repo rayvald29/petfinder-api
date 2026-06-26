@@ -1,0 +1,23 @@
+.
+├── README.md
+├── config
+├── database
+│   └── database.go
+├── estructura.txt
+├── go.mod
+├── go.sum
+├── handlers
+│   └── health_handler.go
+├── main.go
+├── package-lock.json
+├── package.json
+├── prisma
+│   ├── migrations
+│   │   ├── 20260508175358_init
+│   │   │   └── migration.sql
+│   │   └── migration_lock.toml
+│   └── schema.prisma
+├── prisma.config.ts
+└── routes
+
+8 directories, 13 files

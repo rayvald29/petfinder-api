@@ -23,5 +23,7 @@ func main() {
 	})
 
 	router.GET("/health", handlers.HealthHandler)
+	router.POST("/register", handlers.RegisterHandler)
+	router.POST("/login", handlers.LoginHandler)
 	router.Run(":8080")
 }
