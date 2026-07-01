@@ -89,6 +89,15 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "Inicio de sesión exitoso"})
+	token, err := utils.GenerateToken(userID, email)
 
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Error al generar el token"})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Login Successful",
+		"token":   token,
+	})
 }
